@@ -1,0 +1,31 @@
+name: Check Spelling
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  spelling:
+    name: Spelling check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install uv and set Python
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.11.7"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Sync locked environment
+        run: uv sync --locked --group dev
+
+      - name: Run codespell
+        run: uv run codespell . --skip="./.git,./.venv,./dist,./build,./uv.lock"
