@@ -1,3 +1,15 @@
+# Plotting
+*.pdf
+*.png
+
+# Temporary files
+tmp
+*.pth
+*.csv
+*.txt
+logs
+*-draft.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
