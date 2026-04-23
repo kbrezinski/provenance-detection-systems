@@ -25,7 +25,7 @@ class RuntimeConfig:
 
 
 def resolve_device(device: DeviceName = "auto") -> DeviceName:
-    """Resolve 'auto' to a concrete runtime device string."""
+    # Resolve 'auto' to a concrete runtime device string.
     if device == "auto":
         return "cuda" if torch.cuda.is_available() else "cpu"
     return device
