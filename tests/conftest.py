@@ -1,20 +1,31 @@
+import os
+
+# These must be set before torch initializes CUDA-related backends.
+os.environ.setdefault("PYTHONHASHSEED", "0")
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 import random
+
+import numpy as np
 import pytest
 import torch
 
-import numpy as np
-
-TEST_SEED = 1337
+TEST_SEED = 1234
 
 
 @pytest.fixture(autouse=True)
 def reproducible_test_environment():
+    """Reset RNG state and enable deterministic PyTorch behavior for each test."""
+    # Reseed all RNGs per test so model init, sampling, and dropout are repeatable.
     random.seed(TEST_SEED)
     np.random.seed(TEST_SEED)
     torch.manual_seed(TEST_SEED)
 
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(TEST_SEED)
-
+    # Disable cuDNN autotuning, which can choose different kernels across runs.
     torch.backends.cudnn.benchmark = False
+
+    # Prefer deterministic cuDNN implementations when available.
     torch.backends.cudnn.deterministic = True
+
+    # Fail fast if a test uses a PyTorch op without a deterministic implementation.
+    torch.use_deterministic_algorithms(True)
